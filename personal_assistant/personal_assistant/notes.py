@@ -1,8 +1,8 @@
 from collections import UserDict, UserList
 
-class Tags(UserList):       # Класс тэгов. Тип - список
-    def __init__(self, *tags):
-        self.data = list(tags)
+class Tags():       # Класс тэгов. Хранит список тэгов
+    def __init__(self, tags):
+        self.data = tags
     def remove_tag(self, tag):      # Удаление существующего тэга
         try:
             self.data.remove(tag)
@@ -23,7 +23,10 @@ class Note():   # Класс записки
         self.note = note
         self.tags = tags
     def __repr__(self):     # Вызов класса возвращает строку с именем, тэгами и содержанием записки
-        tags = ', '.join(self.tags)
+        try: 
+            tags = ', '.join(self.tags)
+        except TypeError:
+            tags = ''
         return f'''Name: {self.name}
 Tags: {tags}
 
@@ -35,6 +38,8 @@ Tags: {tags}
         self.note = new_note
     def _tags(self):    # Функция при вызове возвращает класс тэгов
         return self.tags
+    def _name(self):
+        return self.name
 
 class Notes(UserDict):      # Класс записок. Тип - словарь вида {уникальный ID записки:записка класса Note}
     def __init__(self):
@@ -50,14 +55,15 @@ class Notes(UserDict):      # Класс записок. Тип - словарь
         note.change_name(new_note_name)
         self.data[note_id] = note
 
-    def change_note(self, note_id:int, new_note):   # Изменяет содержание записки
-        note = self.find_note_by_id(note_id)
+    def change_note(self, note_id, new_note):   # Изменяет содержание записки
+        note = self.find_note_by_id(self._name_id(note_id))
         note.change_note(new_note)
         self.data[note_id] = note
+    def delete_note(self, note):    # Удаляет записку
+        note = self._name_id(note)
 
-    def delete_note(self, note_id: int):    # Удаляет записку
         try:
-            self.data.pop(note_id)
+            self.data.pop(note)
             self._id_order()
         except KeyError:
             print("This note does not exists!")
@@ -89,16 +95,12 @@ class Notes(UserDict):      # Класс записок. Тип - словарь
             elif any(elem in each._tags()  for elem in tags):
                 to_return.append(each)
         return to_return
-
-
-a = Tags('1', '2')
-b = Note('Cooking', 'Recipe', Tags('Cooking', 'Recipes'))
-c = Notes()
-
-c.add_note(b)
-c.add_note(Note('1121', '121', Tags('121212')))
-c.add_note(Note('121212','121314131'))
-
-c.delete_note(1)
-c.add_note(Note('1121', '121', Tags('121212')))
-c.show_all()
+    def find_by_name(self, name):       # Поиск записи по имени
+        for note_id,note in self.data.items():
+            if name.lower() in note._name().lower():
+                return note_id
+    def _name_id(self, string):
+        try:
+            return int(string)
+        except:
+            return self.find_by_name(string)

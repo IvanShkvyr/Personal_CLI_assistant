@@ -13,7 +13,7 @@ def main():
         command = input()
         mode, data = def_mod(command)
         output = commands.get(mode)(book, data)
-        print(output)
+        if output != '': print(output)
         if output == "Good bye!":
             book.write_to_file()
             sys.exit()
