@@ -76,7 +76,7 @@ def def_mod(string: str):
             return "empty", ""
         for key_word in mods.keys():
             if key_word in string.lower():
-                return mods[key_word], string.replace(key_word, "")
+                return mods[key_word], string.replace(key_word, "", 1)
         return 0, ""
     except Exception as err:
         return err
