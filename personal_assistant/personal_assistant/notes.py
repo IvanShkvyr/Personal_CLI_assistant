@@ -91,14 +91,14 @@ class Notes(UserDict):      # Класс записок. Тип - словарь
         return to_return
 
 
-a = Tags('1', '2')
-b = Note('Cooking', 'Recipe', Tags('Cooking', 'Recipes'))
-c = Notes()
-
-c.add_note(b)
-c.add_note(Note('1121', '121', Tags('121212')))
-c.add_note(Note('121212','121314131'))
-
-c.delete_note(1)
-c.add_note(Note('1121', '121', Tags('121212')))
-c.show_all()
+# a = Tags('1', '2')
+# b = Note('Cooking', 'Recipe', Tags('Cooking', 'Recipes'))
+# c = Notes()
+#
+# c.add_note(b)
+# c.add_note(Note('1121', '121', Tags('121212')))
+# c.add_note(Note('121212','121314131'))
+#
+# c.delete_note(1)
+# c.add_note(Note('1121', '121', Tags('121212')))
+# c.show_all()
