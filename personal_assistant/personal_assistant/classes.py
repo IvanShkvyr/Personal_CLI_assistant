@@ -221,7 +221,7 @@ class CustomEncoder(json.JSONEncoder):
         return super().default(0)
 
 
-class AddressBook():
+class AddressBook(UserDict):
 
     def __init__(self):
         self.notes = Notes()

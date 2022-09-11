@@ -70,10 +70,12 @@ def find(book: AddressBook, text: str):
     contacts = book.search_in_names(text)  # list of names
     numbers = book.search_in_phones(text)  # list of tuples (name, number)
     mails = book.search_in_emails(text)
+    notes = book.notes.search_in_notes(text)
+    notes_tags = book.notes.find_by_tags(text)
     result = ""
     if not text:
         return "Nothing to search"
-    if not (contacts or numbers):
+    if not (contacts or numbers or mails or notes or notes_tags):
         return "No matches found"
     else:
         if contacts:
@@ -88,6 +90,15 @@ def find(book: AddressBook, text: str):
             result += f"Matches in email addresses:\n"
             for pair in mails:
                 result += f"\t{pair[0]}: {pair[1]}\n"
+        if notes:
+            result += f"Matches in notes:\n"
+            for each in notes:
+                result += f"\t{each._name()}: {each._note()}\n"
+        if notes_tags:
+            result += f"Matches in notes tags:\n"
+            for each in notes_tags:
+                tags = ','.join(each._tags())
+                result += f"{each._name()}: {tags}\n"
         return result
 
 
@@ -384,6 +395,11 @@ def delete_note(book: AddressBook, *_):
     return "Note deleted successfully!"
 
 @decorator
+def rename_note(book: AddressBook, *_):
+    book.notes.change_note_name(input('Enter note name or note id: '), input('Enter new note name: '))
+    return ''
+
+@decorator
 def change_note(book: AddressBook, *_):
     book.notes.change_note(note_id=input('Enter note name or ID:'), new_note=input("Enter new note: "))
     return "Operation successfull!"
@@ -391,6 +407,11 @@ def change_note(book: AddressBook, *_):
 @decorator
 def show_all_notes(book:AddressBook, *_):
     book.notes.show_all()
+    return ''
+
+@decorator
+def show_note_list(book:AddressBook, *_):
+    book.notes.show_note_list()
     return ''
 
 def help_me(*_):
@@ -413,4 +434,10 @@ def help_me(*_):
            "\tload 'file name': loads existing Address book from 'file name'\n" + \
            "\tfind 'string': searches 'string' in names and phone numbers\n" + \
            "\tclear: clears your Address book\n" + \
-           "\texit: close the assistant\n"
+           "\texit: close the assistant\n" + \
+           "\tcreate note: creates new note" + \
+           "\trename note: renames existing note" + \
+           "\tdelete note: deletes existing note" + \
+           "\tshow notes: shows all notes content" + \
+           "\tshow note list: shows list of notes" + \
+           "\tchange note: changes note content"
