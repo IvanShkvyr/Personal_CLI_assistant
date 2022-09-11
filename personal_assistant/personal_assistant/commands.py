@@ -32,7 +32,7 @@ commands = {
     "change_note": change_note,
     "show_all_notes": show_all_notes,
     "show_note_list": show_note_list,
-    "rename_note":rename_note,
+    "rename_note": rename_note,
     0: lambda *_: "Sorry I can't understand you. Try 'help' command to see what I can.",
 }
 
@@ -73,7 +73,7 @@ def def_mod(string: str):
             "create note": "create_note",
             "delete note": "delete_note",
             "change note": "change_note",
-            "show notes":"show_all_notes",
+            "show notes": "show_all_notes",
             "show note list": "show_note_list"
         }
         if not string:

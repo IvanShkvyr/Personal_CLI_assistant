@@ -9,6 +9,8 @@ no_name = "Sorry, I can't identify a contact's name."
 
 
 def decorator(func):
+    """ Resets show_all function to start again from beginning of the contact list
+    Should be used for all functions called in commands.py except show_all and empty."""
     def inner(*args, **kwargs):
         result = func(*args, **kwargs)
         if isinstance(args[0], AddressBook):
@@ -21,18 +23,24 @@ def decorator(func):
     return inner
 
 
+@decorator
 def save_to_file(book: AddressBook, text: str = ""):
+    """ Saves all data to file. Called by function save or when you exit from the assistant.
+    text (optional variable) is a name of file to save data"""
     text = text.strip()
     return book.write_to_file(text)
 
 
+@decorator
 def read_from_file(book: AddressBook, text: str = ""):
+    """Reads all data from file text (optional) via function load or when you start the assistant"""
     text = text.strip()
     return book.read_from_file(text)
 
 
 @decorator
 def clear(book: AddressBook, *_):
+    """Deletes all date from the AddressBook"""
     if confirm(f"Do you want to delete all contacts from your Address book? Type 'yes'/'no'.\n"):
         book.clear()
         return f"Done!"
@@ -40,7 +48,9 @@ def clear(book: AddressBook, *_):
         return f"Glad you changed your mind."
 
 
+@decorator
 def confirm(question):
+    """Use it when user makes important changes to the AddressBook, for example deleting a contact"""
     while True:
         string = input(question)
         if string.strip().lower() in ("y", "yes"):
@@ -49,7 +59,8 @@ def confirm(question):
             return False
 
 
-def find_name_number(text: str):  # return tuple of name and number
+def find_name_number(text: str):
+    """splits text into phone number and name"""
     text += " "
     pattern = re.compile(phone_pattern)
     only_name = text
@@ -60,12 +71,14 @@ def find_name_number(text: str):  # return tuple of name and number
     return find_name(only_name), str(pattern.findall(text)[0]).strip().replace(" ", "").replace("", ""),
 
 
-def find_name(text: str):  # converts text into name. Should be used only after the numer has been extracted.
+def find_name(text: str):
+    """converts sting into a valid name of contact"""
     return text.strip().lower().title()
 
 
 @decorator
 def find(book: AddressBook, text: str):
+    """searches 'text' in names, numbers, emails, notes text, and notes by teg if 'text' is a list of tags"""
     text = text.strip()
     contacts = book.search_in_names(text)  # list of names
     numbers = book.search_in_phones(text)  # list of tuples (name, number)
@@ -104,30 +117,68 @@ def find(book: AddressBook, text: str):
 
 @decorator
 def find_birthdays(book: AddressBook, text: str):
+    """find contacts whose birthday in int('text') days"""
     text = text.strip()
     try:
         days = int(text)
     except ValueError:
         return "invalid format of the numbers of days"
     if isinstance(days, int):
-        print(days)
         output = []
         for contact in book.data.keys():
             if book.data.get(contact).birthday is not None:
                 if book.data.get(contact).birthday.days_to_next_birthday is not None and \
                         book.data.get(contact).birthday.days_to_next_birthday == days:
                     output.append(contact)
+
+        start_of_phrase = ""
         if not output:
-            return f"Nobody has birthday in {days} days"
+            start_of_phrase = "Nobody has a birthday"
         elif len(output) == 1:
-            return f"{output[0]} has birthday in {days} days"
+            start_of_phrase = f"{output[0]} has a birthday"
         elif len(output) == 2:
-            return f"{output[0]} and {output[1]} have birthday in {days} days"
-        else:
-            return f"{','.join(output[:-1]) + ', and ' + output[-1]} have birthday in {days} days"
+            start_of_phrase = f"{output[0]} and {output[1]} have a birthday"
+        elif len(output) > 2:
+            start_of_phrase = f"{', '.join(output[:-1]) + ', and ' + output[-1]} have a birthday"
+
+        end_of_phrase = ""
+        if days >= 2:
+            end_of_phrase = f" in {days} days"
+        elif days == 1:
+            end_of_phrase = f" tomorrow"
+        elif days == 0:
+            end_of_phrase = f" today"
+        return start_of_phrase + end_of_phrase
+        # if not output:
+        #     if days >= 2:
+        #         return f"Nobody has birthday in {days} days"
+        #     elif days == 1:
+        #         return f"Nobody has birthday tomorrow"
+        #     elif days == 0:
+        #         return f"Nobody has birthday today"
+        #     else:
+        #         return ""
+        # elif len(output) == 1:
+        #     if days >= 2:
+        #         return f"{output[0]} has birthday in {days} days"
+        #     elif days == 1:
+        #         return f"{output[0]} has birthday tomorrow"
+        #     elif days == 0:
+        #         return f"{output[0]} has birthday today"
+        # elif len(output) == 2:
+        #     if days >= 2:
+        #         return f"{output[0]} and {output[1]} have birthday in {days} days"
+        #     if days == 1:
+        #         return f"{output[0]} and {output[1]} have birthday tomorrow"
+        #     if days == 0:
+        #         return f"{output[0]} and {output[1]} have birthday roday"
+        # else:
+        #     if days >= 2:
+        #         return f"{','.join(output[:-1]) + ', and ' + output[-1]} have birthday in {days} days"
 
 
 def name_birthday(book: AddressBook, text: str):
+    """splits 'text' into contact name and a date"""
     for contact in book.data.keys():
         if contact.lower() in text.lower():
             return contact, text.lower().replace(contact.lower(), "", 1).strip()
@@ -135,6 +186,7 @@ def name_birthday(book: AddressBook, text: str):
 
 
 def name_email(book: AddressBook, text: str):
+    """splits 'text' into name and email"""
     for contact in book.data.keys():
         if contact.lower() in text.lower():
             template = re.compile(r"[a-zA-Z][a-zA-Z0-9_.]+@[a-zA-Z]+\.[a-zA-Z][a-zA-Z]+")
@@ -149,25 +201,28 @@ def name_email(book: AddressBook, text: str):
 
 @decorator
 def add_contact(book: AddressBook, data: str):
-    name, number = find_name_number(data)
+    """add contact from 'text' to your AddressBook"""
+    # name, number = find_name_number(data)
+    name = find_name(data)
     if not name:
         return no_name
     elif name in book.data.keys():
         return f"Contact '{name}' already exists"
     else:
-        phone_number = Phone(number)
-        if phone_number.value:
-            record = Record(Name(name), [phone_number])
-            book.add_record(record)
-            return f"Created contact '{name}': '{number}'"
-        else:
-            record = Record(Name(name), [])
-            book.add_record(record)
-            return f"Created contact '{name}' with no phone numbers."
+        # #phone_number = Phone(number)
+        # if phone_number.value:
+        #     record = Record(Name(name), [phone_number])
+        #     book.add_record(record)
+        #     return f"Created contact '{name}': '{number}'"
+        # else:
+        record = Record(Name(name), [])
+        book.add_record(record)
+        return f"Created contact a new contact '{name}'"
 
 
 @decorator
 def rename(book: AddressBook, data: str):
+    """finds an existing contact in 'text' and changes its name """
     name = find_name(data)
     if not name:
         return "Name has not been found"
@@ -190,6 +245,7 @@ def rename(book: AddressBook, data: str):
 
 @decorator
 def show_contact(book: AddressBook, data: str):
+    """shows a contact by its name"""
     name = find_name(data)
     if not name:
         return "Sorry, I can't identify a contact's name"
@@ -200,6 +256,9 @@ def show_contact(book: AddressBook, data: str):
 
 
 def empty(book: AddressBook, *_):
+    """called if an empty command is passed to assistant.
+    works differently if the assistant is in the show records mode.
+    shouldn't be decorated ny decorator to work properly"""
     if not book.showing_records:
         return "Sorry I can't understand you. Try 'help' command to see what I can."
     else:
@@ -207,16 +266,20 @@ def empty(book: AddressBook, *_):
 
 
 @decorator
-def reset(book: AddressBook, text: str = "2"):
+def reset(book: AddressBook, text: str = ""):
+    """resets the show records mode"""
     try:
         n = int(text.strip())
     except ValueError:
-        n = 2
+        n = book.contacts_per_page
     book.reset_iterator(n)
     return "Done!"
 
 
 def show_all(book: AddressBook, text: str = ""):
+    """show all contact by 'n' contact per page
+    default value for n is 10
+    to work properly should not be decorated with the 'decorator'"""
     try:
         n = int(text.strip())
         book.contacts_per_page = n
@@ -225,7 +288,6 @@ def show_all(book: AddressBook, text: str = ""):
     if not book.data:
         return "Your phone book is empty."
     else:
-        output_line = ""
         first = book.page * n + 1  # first contact to show
         last = min(book.page * n + n, book.size)  # last contact to show
         if book.size == last:
@@ -240,7 +302,7 @@ def show_all(book: AddressBook, text: str = ""):
                 output_line += f"End of the address book"
                 book.page = 0
             else:
-                output_line += f"Press 'Enter' to show next {n} contacts or 'reset' to go to the start"
+                output_line += f"Press 'Enter' to show next {n} contacts"
                 book.page += 1
             return output_line
         except StopIteration:
@@ -252,6 +314,7 @@ def show_all(book: AddressBook, text: str = ""):
 
 @decorator
 def phone(book: AddressBook, data: str):
+    """shows phone number of contact from 'data'"""
     name = find_name(data)
     if not name:
         return "Sorry, I can't identify a contact's name"
@@ -263,14 +326,18 @@ def phone(book: AddressBook, data: str):
 
 @decorator
 def add_number(book: AddressBook, data: str):
+    """adds a number from 'text' to an existing contact from 'text'"""
     name, number = find_name_number(data)
     if not name:
         return no_name
     elif not number:
         return no_number
     elif name not in book.data.keys():
-        add_contact(book, data)
-        return f"Created a new contact '{name}' with number '{number}'"
+        return f"Contact '{name}' does not exists"
+    # to create a new contact if it does not exist
+    # elif name not in book.data.keys():
+    #     add_contact(book, data)
+    #     return f"Created a new contact '{name}' with number '{number}'"
     else:
         phone_number = Phone(number)
         if phone_number.value:
@@ -282,6 +349,7 @@ def add_number(book: AddressBook, data: str):
 
 @decorator
 def delete_number(book: AddressBook, data: str):
+    """deletes a number of contact from 'data'"""
     name, number = find_name_number(data)
     if name and not number:
         if name in book.data.keys():
@@ -306,6 +374,7 @@ def delete_number(book: AddressBook, data: str):
 
 @decorator
 def delete_contact(book: AddressBook, data: str):
+    """deletes an existing contact"""
     name, number = find_name_number(data)
     if not name:
         return no_name
@@ -320,6 +389,7 @@ def delete_contact(book: AddressBook, data: str):
 
 @decorator
 def set_birthday(book: AddressBook, data: str):
+    """changes or sets a birthday of the contact"""
     name, birthday = name_birthday(book, data)
     if not name:
         return no_name
@@ -336,6 +406,7 @@ def set_birthday(book: AddressBook, data: str):
 
 @decorator
 def delete_birthday(book: AddressBook, data: str):
+    """clears a birthday field of the contact from 'data'"""
     if not name_birthday(book, data):
         return "Contact does not exist"
     else:
@@ -346,6 +417,7 @@ def delete_birthday(book: AddressBook, data: str):
 
 @decorator
 def add_email(book: AddressBook, data: str):
+    """adds email to the existing contact"""
     name, email = name_email(book, data)
     if not name:
         return "Can't find a valid contact"
@@ -359,7 +431,7 @@ def add_email(book: AddressBook, data: str):
 
 @decorator
 def delete_email(book: AddressBook, data: str):
-    # return "function doesn't work"
+    """deletes one email"""
     name, email = name_email(book, data)
     if not name:
         return "Can't find a valid contact"
@@ -381,38 +453,52 @@ def delete_email(book: AddressBook, data: str):
             else:
                 return f"Contact '{name}' has no email '{email}'."
 
+
 @decorator
 def create_note(book: AddressBook, *_):
+    """creates a new note"""
     note = Note(
-        name=input('Enter name:'), note=input('Enter note: '), tags=Tags(input('Enter tags or press ENTER: ').split(','))
+        name=input('Enter name:'), note=input('Enter note: '),
+        tags=Tags(input('Enter tags or press ENTER: ').split(','))
     )
     book.notes.add_note(note)
-    return 'Note created.'
+    return 'Note created'
+
 
 @decorator
 def delete_note(book: AddressBook, *_):
+    """deletes an existing note"""
     book.notes.delete_note(input('Enter note name or note id: '))
     return "Note deleted successfully!"
 
+
 @decorator
 def rename_note(book: AddressBook, *_):
+    """renames an existing note"""
     book.notes.change_note_name(input('Enter note name or note id: '), input('Enter new note name: '))
     return ''
 
-@decorator
-def change_note(book: AddressBook, *_):
-    book.notes.change_note(note_id=input('Enter note name or ID:'), new_note=input("Enter new note: "))
-    return "Operation successfull!"
 
 @decorator
-def show_all_notes(book:AddressBook, *_):
+def change_note(book: AddressBook, *_):
+    """changes the text of a note"""
+    book.notes.change_note(note_id=input('Enter note name or ID:'), new_note=input("Enter new note: "))
+    return "Operation successful!"
+
+
+@decorator
+def show_all_notes(book: AddressBook, *_):
+    """just shows all the notes to the user"""
     book.notes.show_all()
     return ''
 
+
 @decorator
-def show_note_list(book:AddressBook, *_):
+def show_note_list(book: AddressBook, *_):
+    """shows list of notes"""
     book.notes.show_note_list()
     return ''
+
 
 def help_me(*_):
     return "Hi! Here is the list of known commands:\n" + \
@@ -426,18 +512,19 @@ def help_me(*_):
            "\t\t 'birthday' should be in forman 'mm.dd' or 'mm.dd.year'\n" + \
            "\tdelete birthday 'name': deletes birthday from the contact\n" + \
            "\tdelete contact 'name': deletes contact 'name'\n" + \
-           "\tadd phone 'name' 'phone numer': adds the phone number to the existing contact or creates a new one\n" + \
+           "\tadd phone 'name' 'phone numer': adds the phone number to the existing contact\n" + \
            "\t\tphone number should be 7 digits long + optional 3 digits of city code\n" + \
            "\t\t+ optional 2 digits of country code + optional '+' sight\n" + \
-           "\tdelete phone 'name' 'phone number': deletes the phone number from contact\n" + \
+           "\tdelete phone 'name': deletes all phone numbers from the contact" +\
+           "\tdelete phone 'name' 'phone number': deletes the phone number from the contact\n" + \
            "\tsave 'file name': saves you Address book to 'file name'\n" + \
            "\tload 'file name': loads existing Address book from 'file name'\n" + \
            "\tfind 'string': searches 'string' in names and phone numbers\n" + \
            "\tclear: clears your Address book\n" + \
            "\texit: close the assistant\n" + \
-           "\tcreate note: creates new note" + \
-           "\trename note: renames existing note" + \
-           "\tdelete note: deletes existing note" + \
-           "\tshow notes: shows all notes content" + \
-           "\tshow note list: shows list of notes" + \
-           "\tchange note: changes note content"
+           "\tcreate note: creates new note\n" + \
+           "\trename note: renames existing note\n" + \
+           "\tdelete note: deletes existing note\n" + \
+           "\tshow notes: shows all notes content\n" + \
+           "\tshow note list: shows list of notes\n" + \
+           "\tchange note: changes note content\n"
