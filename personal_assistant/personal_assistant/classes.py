@@ -99,7 +99,6 @@ class Birthday(Field):
         if birthday and birthday.year > 1:
             self.__value = birthday
 
-
     def days_to_birthday(self):
         next_birthday = self.value.replace(year=datetime.now().year)
         next_birthday = next_birthday.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -231,7 +230,7 @@ class AddressBook(UserDict):
         self.page = 0  # number of next page showed with show all
         self.contacts_per_page = 10  # number of contacts showed by show all
         self.show = None  # iterator is not created
-        self.filename = "AddressBook.json"
+        self.filename = "personal_assistant/personal_assistant/AddressBook.json"
         self.names = []
         self.size = 0
 
@@ -264,13 +263,13 @@ class AddressBook(UserDict):
                         record = Record(Name(name), [])
                         self.add_record(record)
                         if birthday:
-                            self.get(name).set_birthday(Birthday(birthday))
+                            self.data.get(name).set_birthday(Birthday(birthday))
                         if phones:
                             for phone in phones:
-                                self.get(name).add_number(Phone(phone))
+                                self.data.get(name).add_number(Phone(phone))
                         if emails:
                             for email in emails:
-                                self.get(name).add_email(Email(email))
+                                self.data.get(name).add_email(Email(email))
 
             return "Done"
 
