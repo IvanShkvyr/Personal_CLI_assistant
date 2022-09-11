@@ -8,8 +8,8 @@ setup(name='personal_assistant',
       author_email='GIS2011i@gmail.com',
       license='MIT',
       packages=find_packages(),
-      # Вписати правильну точку входу
       entry_points={
-                  'console_scripts': ['clean-folder=clean_folder.sort:main']
+                  'console_scripts': ['personal-assistant=personal_assistant.assistant:main',
+                                          'clean-folder=personal_assistant.sort:main']
                   }
       )

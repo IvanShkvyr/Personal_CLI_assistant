@@ -1,6 +1,7 @@
 import classes
 from classes import *
 import re
+from notes import Note, Tags
 
 phone_pattern = "\s\+?[-\s]?(?:\d{2,3})?[-\s]?(?:\([-\s]?\d{2,3}[-\s]?\)|\d{2,3})?[-\s]?\d{2,3}[-\s]?\d{2,3}[-\s]?\d{2,3}\s"
 no_number = "Sorry, I can't identify a phone number."
@@ -369,6 +370,28 @@ def delete_email(book: AddressBook, data: str):
             else:
                 return f"Contact '{name}' has no email '{email}'."
 
+@decorator
+def create_note(book: AddressBook, *_):
+    note = Note(
+        name=input('Enter name:'), note=input('Enter note: '), tags=Tags(input('Enter tags or press ENTER: ').split(','))
+    )
+    book.notes.add_note(note)
+    return 'Note created.'
+
+@decorator
+def delete_note(book: AddressBook, *_):
+    book.notes.delete_note(input('Enter note name or note id: '))
+    return "Note deleted successfully!"
+
+@decorator
+def change_note(book: AddressBook, *_):
+    book.notes.change_note(note_id=input('Enter note name or ID:'), new_note=input("Enter new note: "))
+    return "Operation successfull!"
+
+@decorator
+def show_all_notes(book:AddressBook, *_):
+    book.notes.show_all()
+    return ''
 
 def help_me(*_):
     return "Hi! Here is the list of known commands:\n" + \

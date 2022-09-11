@@ -3,7 +3,8 @@ from datetime import datetime
 from copy import copy, deepcopy
 import json
 from pathlib import Path
-# from notes import Notes
+from notes import Notes
+
 
 def convert_to_date(birthday: str = None):
     birthday_date = None
@@ -220,10 +221,10 @@ class CustomEncoder(json.JSONEncoder):
         return super().default(0)
 
 
-class AddressBook(UserDict):
+class AddressBook():
 
     def __init__(self):
-        super().__init__(self)
+        self.notes = Notes()
         self.data = {}
         self.showing_records = False  # when True 'enter' shows next N contacts
         self.page = 0  # number of next page showed with show all
@@ -262,13 +263,13 @@ class AddressBook(UserDict):
                         record = Record(Name(name), [])
                         self.add_record(record)
                         if birthday:
-                            self.get(name).set_birthday(Birthday(birthday))
+                            self.data.get(name).set_birthday(Birthday(birthday))
                         if phones:
                             for phone in phones:
-                                self.get(name).add_number(Phone(phone))
+                                self.data.get(name).add_number(Phone(phone))
                         if emails:
                             for email in emails:
-                                self.get(name).add_email(Email(email))
+                                self.data.get(name).add_email(Email(email))
 
             return "Done"
 
