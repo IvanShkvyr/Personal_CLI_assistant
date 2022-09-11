@@ -1,9 +1,11 @@
 # from collections import UserDict
+import pathlib
 from datetime import datetime
 from copy import copy, deepcopy
 import json
 from pathlib import Path
 from notes import Notes
+import os
 
 
 def convert_to_date(birthday: str = None):
@@ -229,7 +231,9 @@ class AddressBook:
         self.page = 0  # number of next page showed with show all
         self.contacts_per_page = 10  # number of contacts showed by show all
         self.show = None  # iterator is not created
-        self.filename = "personal_assistant/personal_assistant/AddressBook.json"
+        self.filename = str(pathlib.Path(__file__).parent.resolve()) + r"\AddressBook.json"
+        #print(self.filename)
+        # self.filename = "personal_assistant/personal_assistant/AddressBook.json"
         self.names = []
         self.size = 0
 
