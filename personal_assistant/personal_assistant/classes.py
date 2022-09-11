@@ -263,13 +263,13 @@ class AddressBook():
                         record = Record(Name(name), [])
                         self.add_record(record)
                         if birthday:
-                            self.get(name).set_birthday(Birthday(birthday))
+                            self.data.get(name).set_birthday(Birthday(birthday))
                         if phones:
                             for phone in phones:
-                                self.get(name).add_number(Phone(phone))
+                                self.data.get(name).add_number(Phone(phone))
                         if emails:
                             for email in emails:
-                                self.get(name).add_email(Email(email))
+                                self.data.get(name).add_email(Email(email))
 
             return "Done"
 
