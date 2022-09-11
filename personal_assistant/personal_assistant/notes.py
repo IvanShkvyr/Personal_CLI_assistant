@@ -95,7 +95,9 @@ class Notes(UserDict):      # Notes dict {unique ID:object of class Note()}
             elif any(elem in each._tags()  for elem in tags):
                 to_return.append(each)
         return to_return
+
     def find_by_name(self, name):       # Search by name
+
         for note_id,note in self.data.items():
             if name.lower() in note._name().lower():
                 return note_id
@@ -113,3 +115,4 @@ class Notes(UserDict):      # Notes dict {unique ID:object of class Note()}
             return int(string)
         except:
             return self.find_by_name(string)
+
