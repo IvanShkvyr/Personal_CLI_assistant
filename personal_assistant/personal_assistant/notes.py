@@ -1,4 +1,5 @@
 from collections import UserDict, UserList
+import pickle
 
 class Tags(UserList):       # Tags class. Contains tags strings in list 
     def __init__(self, tags):
@@ -44,11 +45,25 @@ Tags: {tags}
         return self.note
 
 class Notes(UserDict):      # Notes dict {unique ID:object of class Note()}
+    __file_name = "notes.pickle"
     def __init__(self):
         self.data = {}
         self.note_id = 0
-    def __enter__(self):
-        pass
+    def _restore(self):
+        try:
+            with open(self.__file_name, "rb+") as file:
+                book = pickle.load(file)
+                self.data.update(book)
+        except Exception:
+            print("Notes not restored!")
+
+    def _save(self):
+        try:
+            with open(self.__file_name, "wb+") as file:
+                pickle.dump(self.data, file, protocol=pickle.HIGHEST_PROTOCOL)
+        except Exception:
+            print("Some problems with saving!")
+    
     def add_note(self, note: Note):     # Adds new note
         self.data.update({self.note_id:note})
         self.note_id += 1

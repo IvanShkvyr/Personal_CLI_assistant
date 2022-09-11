@@ -10,6 +10,7 @@ def main():
     print("What can I do for you today?")
     book = classes.AddressBook()
     book.read_from_file()
+    book.notes._restore()
     while True:
         size = os.get_terminal_size().lines
         if size > 15:
@@ -29,6 +30,7 @@ def main():
         if output != '': print(output)
         if output == "Good bye!":
             book.write_to_file()
+            book.notes._save()
             sys.exit()
 
 
