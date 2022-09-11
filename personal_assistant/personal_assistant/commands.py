@@ -1,6 +1,7 @@
 from functions import add_contact, show_all, phone, add_number, help_me, delete_number, delete_contact, set_birthday
 from functions import show_contact, empty, reset, delete_birthday, find, save_to_file, read_from_file, clear
-from functions import add_email, delete_email, find_birthdays, rename
+from functions import add_email, delete_email, find_birthdays, rename, create_note, delete_note, change_note
+from functions import show_all_notes, show_note_list, rename_note
 
 
 commands = {
@@ -26,6 +27,12 @@ commands = {
     "delete_email": delete_email,
     "show_birthday": find_birthdays,
     "rename": rename,
+    "create_note": create_note,
+    "delete_note": delete_note,
+    "change_note": change_note,
+    "show_all_notes": show_all_notes,
+    "show_note_list": show_note_list,
+    "rename_note":rename_note,
     0: lambda *_: "Sorry I can't understand you. Try 'help' command to see what I can.",
 }
 
@@ -34,6 +41,7 @@ def def_mod(string: str):
     try:
         mods = {
             # ".": "exit",
+            "rename note": "rename_note",
             "hello": "hello",
             "good bye": "bye",
             "close": "bye",
@@ -62,6 +70,11 @@ def def_mod(string: str):
             "delete email": "delete_email",
             "show birthday": "show_birthday",
             "rename": "rename",
+            "create note": "create_note",
+            "delete note": "delete_note",
+            "change note": "change_note",
+            "show notes":"show_all_notes",
+            "show note list": "show_note_list"
         }
         if not string:
             return "empty", ""
