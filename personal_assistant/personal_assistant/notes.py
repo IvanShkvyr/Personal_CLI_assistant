@@ -1,4 +1,4 @@
-from collections import UserDict, UserList
+from collections import UserDict
 
 class Tags():       # Класс тэгов. Хранит список тэгов
     def __init__(self, tags):
@@ -40,20 +40,22 @@ Tags: {tags}
         return self.tags
     def _name(self):
         return self.name
+    def _note(self):
+        return self.note
 
 class Notes(UserDict):      # Класс записок. Тип - словарь вида {уникальный ID записки:записка класса Note}
     def __init__(self):
         self.data = {}
         self.note_id = 0
-        
+    def __enter__(self):
+        pass
     def add_note(self, note: Note):     # Добавляет новую записку в словарь
         self.data.update({self.note_id:note})
         self.note_id += 1
 
     def change_note_name(self, note_id: int, new_note_name):     # Изменяет название записки
-        note = self.find_note_by_id(note_id)
+        note = self.find_note_by_id(self._name_id(note_id))
         note.change_name(new_note_name)
-        self.data[note_id] = note
 
     def change_note(self, note_id, new_note):   # Изменяет содержание записки
         note = self.find_note_by_id(self._name_id(note_id))
@@ -99,6 +101,15 @@ class Notes(UserDict):      # Класс записок. Тип - словарь
         for note_id,note in self.data.items():
             if name.lower() in note._name().lower():
                 return note_id
+    def show_note_list(self):
+        for each in self.data.values():
+            print(each._name())
+    def search_in_notes(self, text:str):
+        to_return = []
+        for each in self.data.values():
+            if text in each._note():
+                to_return.append(each)
+        return to_return
     def _name_id(self, string):
         try:
             return int(string)

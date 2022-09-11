@@ -70,6 +70,7 @@ def find(book: AddressBook, text: str):
     contacts = book.search_in_names(text)  # list of names
     numbers = book.search_in_phones(text)  # list of tuples (name, number)
     mails = book.search_in_emails(text)
+    notes = book.notes.search_in_notes(text)
     result = ""
     if not text:
         return "Nothing to search"
@@ -88,6 +89,10 @@ def find(book: AddressBook, text: str):
             result += f"Matches in email addresses:\n"
             for pair in mails:
                 result += f"\t{pair[0]}: {pair[1]}\n"
+        if notes:
+            result += f"Matches in notes:\n"
+            for each in notes:
+                result += f"\t{each._name()}: {each._note()}"
         return result
 
 
@@ -384,6 +389,11 @@ def delete_note(book: AddressBook, *_):
     return "Note deleted successfully!"
 
 @decorator
+def rename_note(book: AddressBook, *_):
+    book.notes.change_note_name(input('Enter note name or note id: '), input('Enter new note name: '))
+    return ''
+
+@decorator
 def change_note(book: AddressBook, *_):
     book.notes.change_note(note_id=input('Enter note name or ID:'), new_note=input("Enter new note: "))
     return "Operation successfull!"
@@ -391,6 +401,11 @@ def change_note(book: AddressBook, *_):
 @decorator
 def show_all_notes(book:AddressBook, *_):
     book.notes.show_all()
+    return ''
+
+@decorator
+def show_note_list(book:AddressBook, *_):
+    book.notes.show_note_list()
     return ''
 
 def help_me(*_):
