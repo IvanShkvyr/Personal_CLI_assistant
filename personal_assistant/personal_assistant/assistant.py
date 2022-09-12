@@ -2,12 +2,23 @@ import os
 import sys
 
 from InquirerPy import inquirer
+from InquirerPy import get_style
 
 from classes import AddressBook
 from commands import commands, def_mod
-from functions import find_birthdays
+from functions import find_birthdays, print_c
+
 
 def main():
+    #os.system("color 07")
+    os.system("color")
+    #InquirerPy.utils.get_style(style=None, style_override=True)
+    style = get_style({"questionmark": "#F2F2F2",
+                       "answer": "#F2F2F2",
+                       "question": "#F2F2F2",
+                       "input": "#F2F2F2",
+                       }, style_override=False)
+    style2 = get_style({"answer": "#33F108"}, style_override=False)
     print("\nWelcome to your personal Python assistant!")
     size = os.get_terminal_size().lines
     if size < 15:
@@ -35,6 +46,7 @@ def main():
             request = inquirer.text(
                 message="",
                 completer=create_completer(book),
+                style=style,
                 multicolumn_complete=False,
             ).execute()
             command = request
@@ -43,7 +55,8 @@ def main():
         mode, data = def_mod(command)
         output = commands.get(mode)(book, data)
         if output != '':
-            print(output)
+            # print(output)
+            print(print_c(output, book))
         if output == "Good bye!":
             book.write_to_file()
             book.notes._save()
@@ -51,7 +64,7 @@ def main():
 
 
 def create_completer(book: AddressBook):
-    """ """
+    """ auto-completer for InquirerPy lib"""
 
     names = {}
     for name in book.names:
@@ -79,12 +92,12 @@ def create_completer(book: AddressBook):
             "all": None,
             "note list": None,
             "contact": names,
+            "birthday": names,
         },
         "set": {
             "birthday": names,
         },
         "help": None,
-        "show birthday": None,
         "rename": None,
     }
     return new_dict

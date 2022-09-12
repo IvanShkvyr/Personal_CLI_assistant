@@ -1,4 +1,5 @@
 import re
+import sys
 
 from classes import convert_to_date, AddressBook, Record, Phone, Birthday, Name, Email
 from notes import Note, Tags
@@ -24,6 +25,31 @@ def decorator(func):
     return inner
 
 
+def print_c(text: str, book: AddressBook):
+    """makes all names in text green"""
+    try:
+        if sys.platform == 'win32':
+            result_str = ""
+            names = set(book.names)
+            regex = re.compile('|'.join(re.escape(x) for x in names))
+            result = re.findall(regex, text)
+            for i, name in enumerate(result):
+                result_str += text[:text.find(result[i])]
+                # print(text[:text.find(result[i])], end="")
+                result_str += f"\033[1;32;40m{name}\u001b[0m"
+                # print(f"\033[1;32;40m{name}\u001b[0m", end="")
+                text = text[text.find(result[i]):]
+                text = text.replace(result[i], "", 1)
+            if result_str:
+                result_str += text
+            return result_str
+                #print(text)
+        else:
+            return text
+    except Exception:
+        return text
+
+
 @decorator
 def save_to_file(book: AddressBook, text: str = ""):
     """ Saves all data to file. Called by function save or when you exit from the assistant.
@@ -42,7 +68,7 @@ def read_from_file(book: AddressBook, text: str = ""):
 @decorator
 def clear(book: AddressBook, *_):
     """Deletes all date from the AddressBook"""
-    if confirm(f"Do you want to delete all contacts from your Address book? Type 'yes'/'no'.\n"):
+    if confirm(f"Do you want to delete all contacts from your Address book? Type 'yes'/'no'.\n", book):
         book.clear()
         return f"Done!"
     else:
@@ -50,10 +76,10 @@ def clear(book: AddressBook, *_):
 
 
 @decorator
-def confirm(question):
+def confirm(question: str, book: AddressBook):
     """Use it when user makes important changes to the AddressBook, for example deleting a contact"""
     while True:
-        string = input(question)
+        string = input(print_c(question, book))
         if string.strip().lower() in ("y", "yes"):
             return True
         if string.strip().lower() in ("n", "no"):
@@ -354,7 +380,7 @@ def delete_number(book: AddressBook, data: str):
     name, number = find_name_number(data)
     if name and not number:
         if name in book.data.keys():
-            if confirm(f"Do you want to delete all numbers from contact '{name}'? Type 'yes'/'no'.\n"):
+            if confirm(f"Do you want to delete all numbers from contact '{name}'? Type 'yes'/'no'.\n", book):
                 for number in book.data.get(name).phones:
                     book.data.get(name).del_number(number)
                 return f"Done!"
@@ -381,7 +407,7 @@ def delete_contact(book: AddressBook, data: str):
         return no_name
     elif name in book.data.keys():
         if confirm(f"Contact '{name}' will be deleted/renamed. "
-                   f"Are you sure? Type 'yes' or 'no'.\n"):
+                   f"Are you sure? Type 'yes' or 'no'.\n", book):
             book.delete_record(name)
             return "Done!"
         else:
@@ -439,7 +465,7 @@ def delete_email(book: AddressBook, data: str):
     else:
         if not email:
             if name in book.data.keys():
-                if confirm(f"Do you want to delete all emails from contact '{name}'? Type 'yes'/'no'.\n"):
+                if confirm(f"Do you want to delete all emails from contact '{name}'? Type 'yes'/'no'.\n", book):
                     for mail in book.data.get(name).emails:
                         book.data.get(name).del_email(mail)
                     return "Done"
