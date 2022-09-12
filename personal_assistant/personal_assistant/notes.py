@@ -1,7 +1,12 @@
 from collections import UserDict, UserList
+import pickle
 
 
-class Tags(UserList):  # Tags class. Contains tags strings in list
+class Tags(UserList):
+    """
+    Tags class. Contains tags strings in list
+    """
+    
     def __init__(self, tags):
         super().__init__()
         self.data = tags
@@ -23,7 +28,7 @@ class Tags(UserList):  # Tags class. Contains tags strings in list
         self.append(tag)
 
 
-class Note:  # Note class
+class Note:
     def __init__(self, name, note, tags: Tags = ''):
         self.name = name
         self.note = note
@@ -40,40 +45,58 @@ Tags: {tags}
     {self.note}
         '''
 
-    def change_name(self, new_name):    # Changes notes name
+    def change_name(self, new_name):  # Changes notes name
         self.name = new_name
 
-    def change_note(self, new_note):    # Changes notes content
+    def change_note(self, new_note):  # Changes notes content
         self.note = new_note
 
-    def _tags(self):    # Hidden function. Returns list of tags of note
+    def _tags(self):  # Hidden function. Returns list of tags of note
         return self.tags
 
-    def _name(self):    # Hidden function. Returns name of note
+    def _name(self):  # Hidden function. Returns name of note
         return self.name
 
-    def _note(self):    # Hidden function. Returns content of note
+    def _note(self):  # Hidden function. Returns content of note
         return self.note
 
 
-class Notes(UserDict):      # Notes dict {unique ID:object of class Note()}
+class Notes(UserDict):
+    """
+    Notes dict {unique ID:object of class Note()}
+    """
+    
+    __file_name = "notes.pickle"
+    
     def __init__(self):
         super().__init__()
         self.data = {}
         self.note_id = 0
 
-    def __enter__(self):
-        pass
+    def _restore(self):
+        try:
+            with open(self.__file_name, "rb+") as file:
+                book = pickle.load(file)
+                self.data.update(book)
+        except Exception:
+            print("Notes not restored!")
 
-    def add_note(self, note: Note):     # Adds new note
+    def _save(self):
+        try:
+            with open(self.__file_name, "wb+") as file:
+                pickle.dump(self.data, file, protocol=pickle.HIGHEST_PROTOCOL)
+        except Exception:
+            print("Some problems with saving!")
+
+    def add_note(self, note: Note):  # Adds new note
         self.data.update({self.note_id: note})
         self.note_id += 1
 
-    def change_note_name(self, note_id: int, new_note_name):   # Changes name of note
+    def change_note_name(self, note_id: int, new_note_name):  # Changes name of note
         note = self.find_note_by_id(self._name_id(note_id))
         note.change_name(new_note_name)
 
-    def change_note(self, note_id, new_note):   # Changes notes content
+    def change_note(self, note_id, new_note):  # Changes notes content
         note = self.find_note_by_id(self._name_id(note_id))
         note.change_note(new_note)
         self.data[note_id] = note
@@ -113,7 +136,7 @@ class Notes(UserDict):      # Notes dict {unique ID:object of class Note()}
                 to_return.append(each)
         return to_return
 
-    def find_by_name(self, name):       # Search by name
+    def find_by_name(self, name):  # Search by name
         for note_id, note in self.data.items():
             if name.lower() in note._name().lower():
                 return note_id
@@ -122,7 +145,7 @@ class Notes(UserDict):      # Notes dict {unique ID:object of class Note()}
         for each in self.data.values():
             print(each._name())
 
-    def search_in_notes(self, text: str):    # Search text in notes
+    def search_in_notes(self, text: str):  # Search text in notes
         to_return = []
         for each in self.data.values():
             if text in each._note():
