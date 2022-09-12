@@ -1,8 +1,9 @@
-from collections import UserDict
-from datetime import datetime
+# from collections import UserDict
 from copy import copy, deepcopy
+from datetime import datetime
 import json
 from pathlib import Path
+
 from notes import Notes
 
 
@@ -221,8 +222,7 @@ class CustomEncoder(json.JSONEncoder):
         return super().default(0)
 
 
-class AddressBook(UserDict):
-
+class AddressBook:
     def __init__(self):
         self.notes = Notes()
         self.data = {}
@@ -230,7 +230,9 @@ class AddressBook(UserDict):
         self.page = 0  # number of next page showed with show all
         self.contacts_per_page = 10  # number of contacts showed by show all
         self.show = None  # iterator is not created
-        self.filename = "personal_assistant/personal_assistant/AddressBook.json"
+        self.filename = str(Path(__file__).parent.resolve()) + r"\AddressBook.json"
+        #print(self.filename)
+        # self.filename = "personal_assistant/personal_assistant/AddressBook.json"
         self.names = []
         self.size = 0
 
@@ -293,7 +295,7 @@ class AddressBook(UserDict):
         string = ""
         for i, name in enumerate(self.names):
             contact = name
-            #for i, contact in enumerate(self.data.keys()):
+            # for i, contact in enumerate(self.data.keys()):
             if not i % n:
                 string = ""
             string += str(self.data.get(contact))
@@ -303,7 +305,7 @@ class AddressBook(UserDict):
     def search_in_names(self, text: str = ""):
         lst = []
         text = text.strip().lower()
-        for name in self.keys():
+        for name in self.data.keys():
             if text in name.lower():
                 lst.append(name)
         return lst
@@ -311,8 +313,8 @@ class AddressBook(UserDict):
     def search_in_phones(self, text: str = ""):
         lst = []
         text = text.strip().lower()
-        for name in self.keys():
-            for phone in self.get(name).phones:
+        for name in self.data.keys():
+            for phone in self.data.get(name).phones:
                 if text in phone.value.lower():
                     lst.append((name, phone.value.lower()))
         return lst
@@ -320,8 +322,8 @@ class AddressBook(UserDict):
     def search_in_emails(self, text: str = ""):
         lst = []
         text = text.strip().lower()
-        for name in self.keys():
-            for email in self.get(name).emails:
+        for name in self.data.keys():
+            for email in self.data.get(name).emails:
                 if text in email.value.lower():
                     lst.append((name, email.value.lower()))
         return lst

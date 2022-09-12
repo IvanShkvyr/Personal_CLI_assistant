@@ -266,5 +266,3 @@ def unpacking_archive(file_dict, path):
 
 if __name__ == "__main__":
     main()
-
-#python sort.py C:\Users\user\Desktop\Rozibraty
