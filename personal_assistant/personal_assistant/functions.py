@@ -1,7 +1,8 @@
-import classes
-from classes import *
 import re
+
+from classes import convert_to_date, AddressBook, Record, Phone, Birthday, Name, Email
 from notes import Note, Tags
+
 
 phone_pattern = "\s\+?[-\s]?(?:\d{2,3})?[-\s]?(?:\([-\s]?\d{2,3}[-\s]?\)|\d{2,3})?[-\s]?\d{2,3}[-\s]?\d{2,3}[-\s]?\d{2,3}\s"
 no_number = "Sorry, I can't identify a phone number."
@@ -396,7 +397,7 @@ def set_birthday(book: AddressBook, data: str):
     elif not birthday:
         return "No date specified"
     else:
-        date = classes.convert_to_date(birthday)
+        date = convert_to_date(birthday)
         if date:
             book.data.get(name).set_birthday(Birthday(birthday))
             return "Done"
