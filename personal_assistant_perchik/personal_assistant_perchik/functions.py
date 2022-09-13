@@ -33,17 +33,20 @@ def print_c(text: str, book: AddressBook):
             names = set(book.names)
             regex = re.compile('|'.join(re.escape(x) for x in names))
             result = re.findall(regex, text)
-            for i, name in enumerate(result):
-                result_str += text[:text.find(result[i])]
-                # print(text[:text.find(result[i])], end="")
-                result_str += f"\033[1;32;40m{name}\u001b[0m"
-                # print(f"\033[1;32;40m{name}\u001b[0m", end="")
-                text = text[text.find(result[i]):]
-                text = text.replace(result[i], "", 1)
-            if result_str:
-                result_str += text
+            if result:
+                for i, name in enumerate(result):
+                    result_str += text[:text.find(result[i])]
+                    # print(text[:text.find(result[i])], end="")
+                    result_str += f"\033[1;32;40m{name}\u001b[0m"
+                    # print(f"\033[1;32;40m{name}\u001b[0m", end="")
+                    text = text[text.find(result[i]):]
+                    text = text.replace(result[i], "", 1)
+                if result_str:
+                    result_str += text
 
-                print(result_str)
+                    print(result_str)
+            else:
+                result_str = text
 
             return result_str
                 #print(text)
