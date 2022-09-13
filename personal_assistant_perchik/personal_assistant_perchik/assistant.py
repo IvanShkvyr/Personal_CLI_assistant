@@ -1,5 +1,6 @@
 import os
 import sys
+import shutil
 
 from InquirerPy import inquirer, get_style
 
@@ -7,10 +8,11 @@ from classes import AddressBook
 from commands import commands, def_mod
 from functions import find_birthdays, print_c
 
+
 def main():
-    #os.system("color 07")
-    os.system("color")
-    #InquirerPy.utils.get_style(style=None, style_override=True)
+    # os.system("color 07")
+    os.system("color 07")
+    # InquirerPy.utils.get_style(style=None, style_override=True)
     style = get_style({"questionmark": "#F2F2F2",
                        "answer": "#F2F2F2",
                        "question": "#F2F2F2",
@@ -18,7 +20,8 @@ def main():
                        }, style_override=False)
     style2 = get_style({"answer": "#33F108"}, style_override=False)
     print("\nWelcome to your personal Python assistant!")
-    size = os.get_terminal_size().lines
+    size = get_terminal_size()
+
     if size < 15:
         print("\nYou can increase the size of the terminal to have a better experience working with the command line")
     print("\nWhat can I do for you today?")
@@ -32,11 +35,12 @@ def main():
         congratulate.append(find_birthdays(book, "1"))
     if congratulate:
         print("\nLet me remind that")
-        print("\n".join(congratulate))
+        print(print_c("\n".join(congratulate), book))
         print("Do not forget to congratulate them\n")
     print("How can I help you today?")
     while True:
-        size = os.get_terminal_size().lines
+        # size = os.get_terminal_size().lines
+        size = get_terminal_size()
         if size > 15:
             names = {}
             for name in book.names:
@@ -52,7 +56,7 @@ def main():
         mode, data = def_mod(command)
         output = commands.get(mode)(book, data)
         if output != '':
-            #print(output)
+            # print(output)
             print(print_c(output, book))
         if output == "Good bye!":
             book.write_to_file()
@@ -98,6 +102,20 @@ def create_completer(book: AddressBook):
         "rename": None,
     }
     return new_dict
+
+
+def get_terminal_size():
+    try:
+        size = os.get_terminal_size().lines
+    except OSError:
+        try:
+            # rows, columns = os.popen('stty size', 'r').read().split()
+            rows = shutil.get_terminal_size().lines
+            # print(rows)
+            size = rows
+        except OSError:
+            size = 1
+    return size
 
 
 if __name__ == "__main__":

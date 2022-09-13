@@ -43,8 +43,6 @@ def print_c(text: str, book: AddressBook):
                     text = text.replace(result[i], "", 1)
                 if result_str:
                     result_str += text
-
-                    print(result_str)
             else:
                 result_str = text
 
