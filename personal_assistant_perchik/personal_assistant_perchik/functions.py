@@ -116,10 +116,11 @@ def find(book: AddressBook, text: str):
     mails = book.search_in_emails(text)
     notes = book.notes.search_in_notes(text)
     notes_tags = book.notes.find_by_tags(text)
+    notes_names = book.notes.find_by_name(text)
     result = ""
     if not text:
         return "Nothing to search"
-    if not (contacts or numbers or mails or notes or notes_tags):
+    if not (contacts or numbers or mails or notes or notes_tags or notes_names):
         return "No matches found"
     else:
         if contacts:
@@ -137,12 +138,16 @@ def find(book: AddressBook, text: str):
         if notes:
             result += f"Matches in notes:\n"
             for each in notes:
-                result += f"\t{each._name()}: {each._note()}\n"
+                result += f"\t{each._name()}\n"
         if notes_tags:
             result += f"Matches in notes tags:\n"
             for each in notes_tags:
                 tags = ','.join(each._tags())
                 result += f"{each._name()}: {tags}\n"
+        if notes_names:
+            result += f"Matches in notes names\n"
+            for each in notes_names:
+                result += f"\t{each._name()}\n"
         return result
 
 
@@ -488,32 +493,25 @@ def delete_email(book: AddressBook, data: str):
 @decorator
 def create_note(book: AddressBook, *_):
     """creates a new note"""
-    note = Note(
-        name=input('Enter name:'), note=input('Enter note: '),
-        tags=Tags(input('Enter tags or press ENTER: ').split(','))
-    )
-    book.notes.add_note(note)
+    name = input('Enter name: ')
+    print("Enter note: ", end="") 
+    text = '\n'.join(iter(input, "")),
+    tags = Tags(input('Enter tags or press ENTER: ').split(','))
+    book.notes.add_note(Note(name, text, tags))
     return 'Note created'
 
 
 @decorator
 def delete_note(book: AddressBook, *_):
     """deletes an existing note"""
-    book.notes.delete_note(input('Enter note name or note id: '))
-    return "Note deleted successfully!"
+    book.notes.delete_note()
+    return ""
 
 
 @decorator
-def rename_note(book: AddressBook, *_):
-    """renames an existing note"""
-    book.notes.change_note_name(input('Enter note name or note id: '), input('Enter new note name: '))
-    return ''
-
-
-@decorator
-def change_note(book: AddressBook, *_):
-    """changes the text of a note"""
-    book.notes.change_note(note_id=input('Enter note name or ID:'), new_note=input("Enter new note: "))
+def edit_note(book: AddressBook, *_):
+    """Edits note"""
+    book.notes.edit_note()
     return "Operation successful!"
 
 
@@ -530,6 +528,10 @@ def show_note_list(book: AddressBook, *_):
     book.notes.show_note_list()
     return ''
 
+@decorator
+def show_note(book: AddressBook, *_):
+    """shows certain note"""
+    return book.notes.show_note()
 
 def help_me(*_):
     return "Hi! Here is the list of known commands:\n" + \
@@ -554,8 +556,8 @@ def help_me(*_):
            "\tclear: clears your Address book\n" + \
            "\texit: close the assistant\n" + \
            "\tcreate note: creates new note\n" + \
-           "\trename note: renames existing note\n" + \
            "\tdelete note: deletes existing note\n" + \
            "\tshow notes: shows all notes content\n" + \
            "\tshow note list: shows list of notes\n" + \
-           "\tchange note: changes note content\n"
+           "\tedit note: edits note\n" + \
+           "\tshow note: shows certain note"
