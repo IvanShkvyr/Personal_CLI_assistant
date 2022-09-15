@@ -1,6 +1,6 @@
 import os
 import sys
-import shutil
+import shutil 
 
 from InquirerPy import inquirer, get_style
 
@@ -78,6 +78,7 @@ def create_completer(book: AddressBook):
         "save": None,
         "load": None,
         "phone": names,
+        "create note": None,
         "add": {
             "contact": None,
             "number": names,
@@ -87,11 +88,14 @@ def create_completer(book: AddressBook):
             "contact": names,
             "number": names,
             "birthday": names,
+            "note": None,
         },
         "find": None,
         "show": {
             "all": None,
             "note list": None,
+            "note":None,
+            "notes": None,
             "contact": names,
         },
         "set": {
@@ -99,6 +103,7 @@ def create_completer(book: AddressBook):
         },
         "help": None,
         "show birthday": None,
+        "edit note": None,
         "rename": None,
     }
     return new_dict
