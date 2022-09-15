@@ -54,7 +54,6 @@ def def_mod(string: str):
             "add number": "add_number",
             "add email": "add_email",
             "find": "find",
-            # "add": "add_contact",
             "delete contact": "delete_contact",
             "delete phone number": "delete_number",
             "delete phone": "delete_number",

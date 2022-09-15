@@ -36,9 +36,7 @@ def print_c(text: str, book: AddressBook):
             if result:
                 for i, name in enumerate(result):
                     result_str += text[:text.find(result[i])]
-                    # print(text[:text.find(result[i])], end="")
                     result_str += f"\033[1;32;40m{name}\u001b[0m"
-                    # print(f"\033[1;32;40m{name}\u001b[0m", end="")
                     text = text[text.find(result[i]):]
                     text = text.replace(result[i], "", 1)
                 if result_str:
@@ -47,7 +45,6 @@ def print_c(text: str, book: AddressBook):
                 result_str = text
 
             return result_str
-                #print(text)
         else:
             return text
     except Exception:
@@ -185,32 +182,6 @@ def find_birthdays(book: AddressBook, text: str):
         elif days == 0:
             end_of_phrase = f" today"
         return start_of_phrase + end_of_phrase
-        # if not output:
-        #     if days >= 2:
-        #         return f"Nobody has birthday in {days} days"
-        #     elif days == 1:
-        #         return f"Nobody has birthday tomorrow"
-        #     elif days == 0:
-        #         return f"Nobody has birthday today"
-        #     else:
-        #         return ""
-        # elif len(output) == 1:
-        #     if days >= 2:
-        #         return f"{output[0]} has birthday in {days} days"
-        #     elif days == 1:
-        #         return f"{output[0]} has birthday tomorrow"
-        #     elif days == 0:
-        #         return f"{output[0]} has birthday today"
-        # elif len(output) == 2:
-        #     if days >= 2:
-        #         return f"{output[0]} and {output[1]} have birthday in {days} days"
-        #     if days == 1:
-        #         return f"{output[0]} and {output[1]} have birthday tomorrow"
-        #     if days == 0:
-        #         return f"{output[0]} and {output[1]} have birthday roday"
-        # else:
-        #     if days >= 2:
-        #         return f"{','.join(output[:-1]) + ', and ' + output[-1]} have birthday in {days} days"
 
 
 def name_birthday(book: AddressBook, text: str):
@@ -238,19 +209,12 @@ def name_email(book: AddressBook, text: str):
 @decorator
 def add_contact(book: AddressBook, data: str):
     """add contact from 'text' to your AddressBook"""
-    # name, number = find_name_number(data)
     name = find_name(data)
     if not name:
         return no_name
     elif name in book.data.keys():
         return f"Contact '{name}' already exists"
     else:
-        # #phone_number = Phone(number)
-        # if phone_number.value:
-        #     record = Record(Name(name), [phone_number])
-        #     book.add_record(record)
-        #     return f"Created contact '{name}': '{number}'"
-        # else:
         record = Record(Name(name), [])
         book.add_record(record)
         return f"Created contact a new contact '{name}'"
@@ -370,10 +334,6 @@ def add_number(book: AddressBook, data: str):
         return no_number
     elif name not in book.data.keys():
         return f"Contact '{name}' does not exists"
-    # to create a new contact if it does not exist
-    # elif name not in book.data.keys():
-    #     add_contact(book, data)
-    #     return f"Created a new contact '{name}' with number '{number}'"
     else:
         phone_number = Phone(number)
         if phone_number.value:

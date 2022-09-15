@@ -1,4 +1,4 @@
 [build-system]
 requires = [
-    "InquirerPy"
+    "InquirerPy", 'keyboard'
 ]

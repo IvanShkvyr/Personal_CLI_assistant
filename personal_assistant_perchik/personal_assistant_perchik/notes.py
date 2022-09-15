@@ -1,28 +1,9 @@
+import pickle
+import codecs
 from collections import UserDict, UserList
-import pickle, keyboard, codecs
 
+import keyboard
 
-def input_with_default(prompt_, default_):
-    if prompt_ == "Note: ":
-        default_ = repr(default_).replace("'", "")
-        keyboard.write(default_)
-        print(prompt_, end="\n")
-        s = input()
-        try:
-            s = codecs.decode(s, 'unicode_escape')
-            return s
-        except UnicodeDecodeError:
-            print("You entered invalid string literal! Changes not saved.")
-            return codecs.decode(default_, 'unicode_escape')     
-    elif prompt_ == "Tags: ":
-        if default_[0] == "NONE" or default_[0] == "":
-            return input(prompt_)
-        else:
-            keyboard.write(",".join(default_))
-            return input(prompt_)
-    else:
-        keyboard.write(default_)
-        return input(prompt_)
 
 class Tags(UserList):
     """
@@ -200,3 +181,24 @@ class Notes(UserDict):
         for note in data.values():
             self.add_note(note)
 
+def input_with_default(prompt_, default_):
+    if prompt_ == "Note: ":
+        default_ = repr(default_).replace("'", "")
+        keyboard.write(default_)
+        print(prompt_, end="\n")
+        s = input()
+        try:
+            s = codecs.decode(s, 'unicode_escape')
+            return s
+        except UnicodeDecodeError:
+            print("You entered invalid string literal! Changes not saved.")
+            return codecs.decode(default_, 'unicode_escape')     
+    elif prompt_ == "Tags: ":
+        if default_[0] == "NONE" or default_[0] == "":
+            return input(prompt_)
+        else:
+            keyboard.write(",".join(default_))
+            return input(prompt_)
+    else:
+        keyboard.write(default_)
+        return input(prompt_)

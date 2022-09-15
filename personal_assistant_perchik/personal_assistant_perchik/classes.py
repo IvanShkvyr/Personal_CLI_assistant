@@ -7,25 +7,6 @@ from pathlib import Path
 from notes import Notes
 
 
-def convert_to_date(birthday: str = None):
-    birthday_date = None
-    try:
-        birthday_date = datetime.strptime(birthday, '%m.%d.%Y')
-    except ValueError:
-        pass
-    try:
-        birthday_date = datetime.strptime(birthday, '%m.%d')
-        birthday_date = birthday_date.replace(year=2)
-    except ValueError:
-        pass
-    try:
-        birthday = birthday.replace("29", "28", 1)
-        birthday_date = datetime.strptime(birthday, '%m.%d.%Y')
-    except:
-        pass
-    return birthday_date
-
-
 class Field:
     def __init__(self):
         self.__value = None
@@ -128,7 +109,6 @@ class Email(Field):
 
 class Record:
     def __init__(self, name: Name, phones: list[Phone] = []):
-        #  def __init__(self, name: Name, phones: list[Phone] = [], birthday: Birthday = None, mails: list[Email] = []):
         self.name = name
         self.phones = phones
         self.birthday = None
@@ -159,14 +139,13 @@ class Record:
         if self.phones:
             string += f"\n\tPhone numbers: {', '.join([x.value for x in self.phones])}"
         if self.emails:
-            string += f"\n\tEmail: {', '.join([x.value for x in self.emails])}"
+            string += f"\n\tE-mails: {', '.join([x.value for x in self.emails])}"
         if self.birthday:
             birthday = self.birthday.value
             if birthday.year > 2:
                 string += f"\n\tBirthday: {birthday.strftime('%d %B %Y')}"
             else:
                 string += f"\n\tBirthday: {birthday.strftime('%d %B')}"
-            #when_to_congratulate = self.days_to_birthday()
             when_to_congratulate = self.birthday.days_to_next_birthday
             if when_to_congratulate is not None:
                 if when_to_congratulate == 0:
@@ -190,7 +169,6 @@ class Record:
         self.birthday = birthday
 
     def add_email(self, email: Email):
-        # print("added", self.name.value)
         self.emails.append(email)
 
     def del_email(self, email: Email):
@@ -230,10 +208,8 @@ class AddressBook:
         self.page = 0  # number of next page showed with show all
         self.contacts_per_page = 10  # number of contacts showed by show all
         self.show = None  # iterator is not created
-        #self.filename = str(Path(__file__).parent.resolve()) + r"\AddressBook.json"
         self.filename = str(Path(__file__).parent.resolve()) + r"/AddressBook.json"
-        #print(self.filename)
-        # self.filename = "personal_assistant/personal_assistant/AddressBook.json"
+
         self.names = []
         self.size = 0
 
@@ -296,7 +272,6 @@ class AddressBook:
         string = ""
         for i, name in enumerate(self.names):
             contact = name
-            # for i, contact in enumerate(self.data.keys()):
             if not i % n:
                 string = ""
             string += str(self.data.get(contact))
@@ -328,3 +303,22 @@ class AddressBook:
                 if text in email.value.lower():
                     lst.append((name, email.value.lower()))
         return lst
+
+
+def convert_to_date(birthday: str = None):
+    birthday_date = None
+    try:
+        birthday_date = datetime.strptime(birthday, '%m.%d.%Y')
+    except ValueError:
+        pass
+    try:
+        birthday_date = datetime.strptime(birthday, '%m.%d')
+        birthday_date = birthday_date.replace(year=2)
+    except ValueError:
+        pass
+    try:
+        birthday = birthday.replace("29", "28", 1)
+        birthday_date = datetime.strptime(birthday, '%m.%d.%Y')
+    except:
+        pass
+    return birthday_date

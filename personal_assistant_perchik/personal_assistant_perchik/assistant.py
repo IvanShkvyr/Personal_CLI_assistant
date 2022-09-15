@@ -10,9 +10,7 @@ from functions import find_birthdays, print_c
 
 
 def main():
-    # os.system("color 07")
     os.system("color 07")
-    # InquirerPy.utils.get_style(style=None, style_override=True)
     style = get_style({"questionmark": "#F2F2F2",
                        "answer": "#F2F2F2",
                        "question": "#F2F2F2",
@@ -39,7 +37,6 @@ def main():
         print("Do not forget to congratulate them\n")
     print("How can I help you today?")
     while True:
-        # size = os.get_terminal_size().lines
         size = get_terminal_size()
         if size > 15:
             names = {}
@@ -56,7 +53,6 @@ def main():
         mode, data = def_mod(command)
         output = commands.get(mode)(book, data)
         if output != '':
-            # print(output)
             print(print_c(output, book))
         if output == "Good bye!":
             book.write_to_file()
@@ -65,8 +61,6 @@ def main():
 
 
 def create_completer(book: AddressBook):
-    """ """
-
     names = {}
     for name in book.names:
         names[name] = None
@@ -114,9 +108,7 @@ def get_terminal_size():
         size = os.get_terminal_size().lines
     except OSError:
         try:
-            # rows, columns = os.popen('stty size', 'r').read().split()
             rows = shutil.get_terminal_size().lines
-            # print(rows)
             size = rows
         except OSError:
             size = 1
