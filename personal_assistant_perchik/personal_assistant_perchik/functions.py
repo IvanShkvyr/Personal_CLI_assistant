@@ -1,3 +1,4 @@
+from abc import abstractmethod, ABC
 import re
 import sys
 
@@ -8,6 +9,76 @@ from notes import Note, Tags
 phone_pattern = "\s\+?[-\s]?(?:\d{2,3})?[-\s]?(?:\([-\s]?\d{2,3}[-\s]?\)|\d{2,3})?[-\s]?\d{2,3}[-\s]?\d{2,3}[-\s]?\d{2,3}\s"
 no_number = "Sorry, I can't identify a phone number."
 no_name = "Sorry, I can't identify a contact's name."
+
+
+class IPrinter(ABC):
+
+    @abstractmethod
+    def print_info(self, *args):
+        pass
+
+
+class ShowContact(IPrinter):  # працює
+
+    def print_info(self, massege):
+        return massege
+
+
+class ShowAll(IPrinter):
+
+    def print_info(self, book, n):
+
+        if not book.data:
+            return "Your phone book is empty."
+        else:
+            first = book.page * n + 1  # first contact to show
+            last = min(book.page * n + n, book.size)  # last contact to show
+            if book.size == last:
+                pass
+            zero_line = f"Showing contacts {first}-{last} from {book.size} records:\n"
+            if not book.showing_records:
+                book.showing_records = True
+                book.reset_iterator(n)
+            try:
+                output_line = zero_line + next(book.show)
+                if last == book.size:
+                    output_line += f"End of the address book"
+                    book.page = 0
+                else:
+                    output_line += f"Press 'Enter' to show next {n} contacts"
+                    book.page += 1
+                return output_line
+            except StopIteration:
+                book.showing_records = False
+                book.reset_iterator(n)
+                book.page = 0
+                return ""
+
+class ShowAllNotes(IPrinter):
+
+    def print_info(self, massege):
+        return massege
+
+
+class ShowNoteList(IPrinter):
+
+    def print_info(self, massege):
+        return massege
+
+
+
+class ShowNote(IPrinter):
+
+    def print_info(self, massege):
+        return massege
+
+
+class ShowHelpMe(IPrinter):
+
+    def print_info(self, massege):
+        return massege
+
+
 
 
 def decorator(func):
@@ -252,7 +323,9 @@ def show_contact(book: AddressBook, data: str):
     if name not in book.data.keys():
         return f"Contact '{name}' is not in your contacts"
     else:
-        return str(book.data.get(name))
+        message = str(book.data.get(name))
+        str_message = ShowContact()
+        return str_message.print_info(message)
 
 
 def empty(book: AddressBook, *_):
@@ -285,31 +358,14 @@ def show_all(book: AddressBook, text: str = ""):
         book.contacts_per_page = n
     except ValueError:
         n = book.contacts_per_page
-    if not book.data:
-        return "Your phone book is empty."
-    else:
-        first = book.page * n + 1  # first contact to show
-        last = min(book.page * n + n, book.size)  # last contact to show
-        if book.size == last:
-            pass
-        zero_line = f"Showing contacts {first}-{last} from {book.size} records:\n"
-        if not book.showing_records:
-            book.showing_records = True
-            book.reset_iterator(n)
-        try:
-            output_line = zero_line + next(book.show)
-            if last == book.size:
-                output_line += f"End of the address book"
-                book.page = 0
-            else:
-                output_line += f"Press 'Enter' to show next {n} contacts"
-                book.page += 1
-            return output_line
-        except StopIteration:
-            book.showing_records = False
-            book.reset_iterator(n)
-            book.page = 0
-            return ""
+
+    str_message = ShowAll()
+    return str_message.print_info(book, n)
+
+
+
+
+        
 
 
 @decorator
@@ -478,23 +534,30 @@ def edit_note(book: AddressBook, *_):
 @decorator
 def show_all_notes(book: AddressBook, *_):
     """just shows all the notes to the user"""
-    book.notes.show_all()
-    return ''
+    message = str(book.notes.show_all())
+    str_message = ShowAllNotes()
+    return str_message.print_info(message)
 
 
 @decorator
 def show_note_list(book: AddressBook, *_):
     """shows list of notes"""
-    book.notes.show_note_list()
-    return ''
+    message = str(book.notes.show_note_list())
+    str_message = ShowNoteList()
+    return str_message.print_info(message)
+
 
 @decorator
 def show_note(book: AddressBook, *_):
     """shows certain note"""
-    return book.notes.show_note()
+    message = str(book.notes.show_note())
+    str_message = ShowNoteList()
+    return str_message.print_info(message)
+
 
 def help_me(*_):
-    return "Hi! Here is the list of known commands:\n" + \
+
+    message = "Hi! Here is the list of known commands:\n" + \
            "\tshow all: shows all your contacts by '2' on page\n" + \
            "\t\tor try:\tshow all 'n': to show all your contacts by 'n' on page\n" + \
            "\treset 'n': return to the start of the contacts, sets showed number of contacts on page to 'n'\n" + \
@@ -521,3 +584,10 @@ def help_me(*_):
            "\tshow note list: shows list of notes\n" + \
            "\tedit note: edits note\n" + \
            "\tshow note: shows certain note"
+    str_message = ShowHelpMe()
+    return str_message.print_info(message)
+
+
+
+
+            

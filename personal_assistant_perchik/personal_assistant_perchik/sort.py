@@ -264,5 +264,5 @@ def unpacking_archive(file_dict, path):
                 os.unlink(file_path)
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
